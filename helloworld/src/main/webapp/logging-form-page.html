@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WildFly Manual Logging Form</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        select, input[type="text"] {
+            width: 100%;
+            padding: 5px;
+            margin-top: 5px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>WildFly Manual Logging Form</h1>
+    <form id="loggingForm">
+        <label for="severity">Severity:</label>
+        <select id="severity" required></select>
+
+        <label for="logger">Logger:</label>
+        <select id="logger" required></select>
+
+        <label for="message">Message:</label>
+        <input type="text" id="message" required>
+
+        <label>
+            <input type="checkbox" id="includeException"> Include Exception
+        </label>
+
+        <button type="submit">Submit Log</button>
+    </form>
+
+    <h2>Recent Logs</h2>
+    <table id="recentLogs">
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>Severity</th>
+                <th>Logger</th>
+                <th>Message</th>
+                <th>Exception</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <script>
+        $(document).ready(function() {
+            let recentLogs = [];
+
+            // Fetch severities
+            $.get('/services/logging/severities', function(data) {
+                data.forEach(function(severity) {
+                    $('#severity').append($('<option></option>').val(severity).text(severity));
+                });
+            });
+
+            // Fetch loggers
+            $.get('/services/logging/loggers', function(data) {
+                data.forEach(function(logger) {
+                    $('#logger').append($('<option></option>').val(logger).text(logger));
+                });
+            });
+
+            // Function to update the recent logs table
+            function updateRecentLogsTable() {
+                let tbody = $('#recentLogs tbody');
+                tbody.empty();
+                recentLogs.forEach(function(log) {
+                    tbody.append(`
+                        <tr>
+                            <td>${log.timestamp}</td>
+                            <td>${log.severity}</td>
+                            <td>${log.logger}</td>
+                            <td>${log.message}</td>
+                            <td>${log.includeException ? 'Yes' : 'No'}</td>
+                        </tr>
+                    `);
+                });
+            }
+
+            // Handle form submission
+            $('#loggingForm').submit(function(e) {
+                e.preventDefault();
+
+                var logData = {
+                    severity: $('#severity').val(),
+                    logger: $('#logger').val(),
+                    message: $('#message').val(),
+                    includeException: $('#includeException').is(':checked')
+                };
+
+                $.ajax({
+                    url: '/services/logging/log',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(logData),
+                    success: function(response) {
+
+                        // Add the new log to the recent logs list
+                        recentLogs.unshift({
+                            timestamp: new Date().toLocaleString(),
+                            ...logData
+                        });
+
+                        // Keep only the 10 most recent logs
+                        recentLogs = recentLogs.slice(0, 10);
+
+                        // Update the table
+                        updateRecentLogsTable();
+
+                        $('#message').val(''); // Clear the message field
+                        $('#includeException').prop('checked', false); // Uncheck the exception checkbox
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Error submitting log: ' + error);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

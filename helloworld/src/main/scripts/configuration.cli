@@ -1,0 +1,28 @@
+# Add the socket binding
+/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=log-server:add(host=localhost, port=9090)
+# Add a json-formatter
+/subsystem=logging/json-formatter=logstash:add(exception-output-type=formatted)
+# Add the socket handler
+/subsystem=logging/socket-handler=log-server-handler:add(named-formatter=logstash, level=INFO, outbound-socket-binding-ref=log-server)
+# Wrap in async handler
+/subsystem=logging/async-handler=async-log-server-handler:add(subhandlers=[log-server-handler], queue-length=50)
+# Add the handler to the root logger
+/subsystem=logging/root-logger=ROOT:add-handler(name=async-log-server-handler)
+
+# Set up metrics forwarding
+/subsystem=micrometer:write-attribute(name=endpoint, value="http://localhost:4318/v1/metrics")
+# Report all endpoints
+/subsystem=micrometer:write-attribute(name=exposed-subsystems, value=["*"])
+/subsystem=micrometer:write-attribute(name="step",value="1")
+
+# CLI script to enable OpenTelemetry for the quickstart application in the application server
+if (outcome != success) of /extension=org.wildfly.extension.opentelemetry:read-resource
+    /extension=org.wildfly.extension.opentelemetry:add()
+    /subsystem=opentelemetry:add()
+end-if
+/subsystem=opentelemetry:write-attribute(name=endpoint,value=http://localhost:4317)
+/subsystem=opentelemetry:write-attribute(name=exporter-type,value=otlp)
+/subsystem=opentelemetry:write-attribute(name=sampler-type,value=on)
+#/extension=org.wildfly.extension.microprofile.telemetry:add()
+#/subsystem=microprofile-telemetry:add
+#/subsystem=microprofile-config-smallrye/config-source=props:add(properties={"otel.sdk.disabled"="false"})

@@ -1,0 +1,10 @@
+package org.jboss.as.quickstarts.helloworld;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+
+@Path("wish")
+public interface Wish {
+    @GET
+    Message wish();
+}

@@ -45,11 +45,14 @@
     <properties>
         <!-- the Maven project should use the minimum Java SE version supported -->
         <maven.compiler.release>17</maven.compiler.release>
+        <maven.compiler.release>16</maven.compiler.release>
         <!-- the version for the Server -->
         <version.server>35.0.0.Final</version.server>
         <!-- the versions for BOMs, Packs and Plugins -->
         <version.bom.ee>${version.server}</version.bom.ee>
         <version.plugin.wildfly>5.1.1.Final</version.plugin.wildfly>
+        <version.plugin.wildfly>5.0.1.Final</version.plugin.wildfly>
+        <version.bom.microprofile>${version.server}</version.bom.microprofile>
     </properties>
 
     <dependencyManagement>
@@ -62,6 +65,13 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>org.wildfly.bom</groupId>
+                <artifactId>wildfly-microprofile</artifactId>
+                <version>${version.bom.microprofile}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -70,6 +80,99 @@
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.enterprise</groupId>
+            <artifactId>jakarta.enterprise.cdi-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.inject</groupId>
+            <artifactId>jakarta.inject-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
+            <!-- Provided by WildFly -->
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.opentelemetry.instrumentation</groupId>
+            <artifactId>opentelemetry-instrumentation-annotations</artifactId>
+            <version>2.8.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-context</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.opentelemetry.instrumentation</groupId>
+            <artifactId>opentelemetry-jdbc</artifactId>
+            <version>2.8.0-alpha</version>
+        </dependency>
+
+        <!--dependency>
+            <groupId>org.jboss.resteasy.microprofile</groupId>
+            <artifactId>microprofile-rest-client</artifactId>
+            <scope>provided</scope>
+        </dependency-->
+
+        <!--Import dependencies to hibernate packages(eg. hibernate-core)
+        depending on features you want to use like Hibernate Session used in the
+        quickstart.
+        Scope is provided because these JARs are shipped with JBoss EAP -->
+        <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Import the JPA API, we use provided scope as the API is included in EAP -->
+        <dependency>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Bean Validation Implementation
+                Provides portable constraints such as @Email
+                Hibernate Validator is shipped in JBoss EAP -->
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- hibernate-validator dependencies excluded on server dependency management yet required -->
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
             <scope>provided</scope>
         </dependency>
 
@@ -91,6 +194,18 @@
                     <artifactId>wildfly-maven-plugin</artifactId>
                     <version>${version.plugin.wildfly}</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>3.5.0</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>10.18.2</version>
+                        </dependency>
+                    </dependencies>
+                  </plugin>
             </plugins>
         </pluginManagement>
     </build>
@@ -161,6 +276,11 @@
                                 <version>${version.server}</version>
                                 <context>cloud</context>
                             </discover-provisioning-info>
+                            <!-- Execute the script in offline mode -->
+                            <offline>true</offline>
+                            <scripts>
+                                <script>${project.build.scriptSourceDirectory}/configuration.cli</script>
+                            </scripts>
                         </configuration>
                         <executions>
                             <execution>
@@ -178,6 +298,52 @@
                             <execution>
                                 <id>attach-sources</id>
                                 <phase>none</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>container</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.wildfly.plugins</groupId>
+                        <artifactId>wildfly-maven-plugin</artifactId>
+                        <configuration>
+                            <discover-provisioning-info>
+                                <version>${version.server}</version>
+                                <context>cloud</context>
+                                <add-ons>
+                                    <add-on>micrometer</add-on>
+                                    <add-on>oracle</add-on>
+                                </add-ons>
+                                <suggest>true</suggest>
+                                <verbose>true</verbose>
+                            </discover-provisioning-info>
+                            <!--
+                                The parent POM's 'openshift' profile renames the output archive to ROOT.war so that the
+                                application is deployed in the root web context. Add ROOT.war to the server.
+                            -->
+                            <filename>ROOT.war</filename>
+                            <packaging-scripts>
+                                <packaging-script>
+                                    <scripts>
+                                        <script>${project.build.scriptSourceDirectory}/configuration.cli</script>
+                                    </scripts>
+                                </packaging-script>
+                            </packaging-scripts>
+                            <registry>lima-operator.internal:5000</registry>
+                            <push>true</push>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>package</goal>
+                                    <goal>image</goal>
+                                </goals>
                             </execution>
                         </executions>
                     </plugin>

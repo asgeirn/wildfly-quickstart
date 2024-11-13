@@ -9,6 +9,8 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
@@ -64,7 +66,7 @@ public class Greetings {
     @Produces(MediaType.TEXT_PLAIN)
     public Response hello(
             @PathParam("location") String location,
-            @HeaderParam("X-Real-IP") @DefaultValue("0.0.0.0") String source,
+            @HeaderParam("X-Forwarded-For") @DefaultValue("0.0.0.0") String source,
             @HeaderParam("X-User") @DefaultValue("unknown") String user) {
         Span prepareHelloSpan = tracer.spanBuilder("prepare-hello").startSpan();
         prepareHelloSpan.setAttribute("greeting", location);
@@ -116,7 +118,7 @@ public class Greetings {
     @Path("/list")
     @Produces(MediaType.APPLICATION_JSON)
     public List<Greeting> getAllGreetings(
-            @HeaderParam("X-Real-IP") @DefaultValue("0.0.0.0") String source,
+            @HeaderParam("X-Forwarded-For") @DefaultValue("0.0.0.0") String source,
             @HeaderParam("X-User") @DefaultValue("unknown") String user) {
         var listGreetingsSpan = tracer.spanBuilder("list-greetings").startSpan();
         listGreetingsSpan.setAttribute("user", user);
@@ -146,7 +148,7 @@ public class Greetings {
     public Response createHello(
             @PathParam("location") String location,
             @PathParam("message") String message,
-            @HeaderParam("X-Real-IP") String source) {
+            @HeaderParam("X-Forwarded-For") String source) {
         Span createHelloSpan = tracer.spanBuilder("create-hello").startSpan();
         MDC.put("message", message);
         log.infof("Creating greeting for %s from %s", location, source);
@@ -168,6 +170,15 @@ public class Greetings {
             createHelloSpan.end();
             MDC.clear();
         }
+    }
+
+    @GET
+    @Path("/headers")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response getHeaders(@Context HttpHeaders headers) {
+        StringBuilder builder = new StringBuilder();
+        headers.getRequestHeaders().forEach((k, v) -> builder.append(k).append('=').append(String.join(",", v)).append('\n'));
+        return Response.ok(builder.toString()).build();
     }
 
 }

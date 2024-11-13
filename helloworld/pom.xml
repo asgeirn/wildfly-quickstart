@@ -352,8 +352,8 @@
                                     </scripts>
                                 </packaging-script>
                             </packaging-scripts>
-                            <registry>lima-operator.internal:5000</registry>
-                            <push>true</push>
+                            <registry>lima-debian.internal</registry>
+                            <push>false</push>
                         </configuration>
                         <executions>
                             <execution>

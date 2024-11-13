@@ -60,7 +60,7 @@ public class Logging {
         Level level = Level.valueOf(logData.severity());
         if (logData.includeException()) {
             Exception e = new RuntimeException(logData.message());
-            Logger.getLogger(logData.logger()).log(level, logData.message(), e);
+            Logger.getLogger(logData.logger()).log(level, "Exception: " + logData.message(), e);
         } else {
             Logger.getLogger(logData.logger()).log(level, logData.message());
         }

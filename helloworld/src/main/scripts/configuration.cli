@@ -9,6 +9,9 @@
 # Add the handler to the root logger
 /subsystem=logging/root-logger=ROOT:add-handler(name=async-log-server-handler)
 
+# Set up access log to file
+/subsystem=undertow/server=default-server/host=default-host/setting=access-log:add(pattern="%h %l %u %t '%r' %s %b %D", directory="/data/logs", prefix="access_log.", suffix="log")
+
 # Set up metrics forwarding
 /subsystem=micrometer:write-attribute(name=endpoint, value="http://localhost:4318/v1/metrics")
 # Report all endpoints
@@ -27,5 +30,6 @@ end-if
 #/subsystem=microprofile-telemetry:add
 #/subsystem=microprofile-config-smallrye/config-source=props:add(properties={"otel.sdk.disabled"="false"})
 
-# Enable Undertow statistics
+# Enable statistics
 /subsystem=undertow:write-attribute(name=statistics-enabled,value=true)
+/subsystem=transactions:write-attribute(name=statistics-enabled, value=true)

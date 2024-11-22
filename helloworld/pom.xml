@@ -46,13 +46,11 @@
     <properties>
         <!-- the Maven project should use the minimum Java SE version supported -->
         <maven.compiler.release>17</maven.compiler.release>
-        <maven.compiler.release>16</maven.compiler.release>
         <!-- the version for the Server -->
         <version.server>35.0.0.Final</version.server>
         <!-- the versions for BOMs, Packs and Plugins -->
         <version.bom.ee>${version.server}</version.bom.ee>
         <version.plugin.wildfly>5.1.1.Final</version.plugin.wildfly>
-        <version.plugin.wildfly>5.0.1.Final</version.plugin.wildfly>
         <version.bom.microprofile>${version.server}</version.bom.microprofile>
         <opentelemetry.version>1.43.0</opentelemetry.version>
         <opentelemetry.instrumentation.version>2.9.0-alpha</opentelemetry.instrumentation.version>
@@ -347,8 +345,7 @@
                             <packaging-scripts>
                                 <packaging-script>
                                     <scripts>
-                                        <script>
-                                            ${project.build.scriptSourceDirectory}/configuration.cli</script>
+                                        <script>${project.build.scriptSourceDirectory}/configuration.cli</script>
                                     </scripts>
                                 </packaging-script>
                             </packaging-scripts>

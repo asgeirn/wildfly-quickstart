@@ -345,8 +345,7 @@
                             <packaging-scripts>
                                 <packaging-script>
                                     <scripts>
-                                        <script>
-                                            ${project.build.scriptSourceDirectory}/configuration.cli</script>
+                                        <script>${project.build.scriptSourceDirectory}/configuration.cli</script>
                                     </scripts>
                                 </packaging-script>
                             </packaging-scripts>

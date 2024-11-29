@@ -3,11 +3,7 @@
   "packages": {
     "openjdk": "17",
     "maven":   "latest",
-    "buildah": "latest",
-    "shadow": {
-      "version":            "latest",
-      "excluded_platforms": ["aarch64-darwin"]
-    }
+    "podman":  "latest"
   },
   "shell": {
     "init_hook": [

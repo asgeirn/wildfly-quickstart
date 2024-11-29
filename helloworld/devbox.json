@@ -3,7 +3,7 @@
   "packages": [
     "openjdk@17",
     "maven@latest",
-    "podman@latest"
+    "docker@latest"
   ],
   "shell": {
     "init_hook": [

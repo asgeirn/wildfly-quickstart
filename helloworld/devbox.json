@@ -3,7 +3,7 @@
   "packages": [
     "openjdk@17",
     "maven@latest",
-    "buildah-unwrapped@latest"
+    "buildah@latest"
   ],
   "shell": {
     "init_hook": [

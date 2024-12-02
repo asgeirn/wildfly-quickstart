@@ -67,7 +67,8 @@ public class Greetings {
     public Response hello(
             @PathParam("location") String location,
             @HeaderParam("X-Forwarded-For") @DefaultValue("0.0.0.0") String source,
-            @HeaderParam("X-User") @DefaultValue("unknown") String user) {
+            @HeaderParam("X-User") @DefaultValue("unknown") String user,
+            @HeaderParam("X-Seasons") @DefaultValue("false") Boolean seasons) {
         Span prepareHelloSpan = tracer.spanBuilder("prepare-hello").startSpan();
         prepareHelloSpan.setAttribute("greeting", location);
         prepareHelloSpan.setAttribute("source", source);
@@ -83,7 +84,13 @@ public class Greetings {
                 if (greeting != null) {
                     var message = greeting.getMessage();
                     MDC.put("message", message);
-                    StringBuilder builder = new StringBuilder().append("Hello, ").append(message).append('!');
+                    StringBuilder builder = new StringBuilder();
+                    if (Boolean.TRUE.equals(seasons)) {
+                        builder.append("Ho-ho-ho, ");
+                    } else {
+                        builder.append("Hello, ");
+                    }
+                    builder.append(message).append('!');
                     var wish = wellbeing.wish();
                     if (wish.message() != null && !wish.message().isBlank()) {
                         MDC.put("wish", wish.message());

@@ -73,11 +73,12 @@ public class Greetings {
         prepareHelloSpan.setAttribute("greeting", location);
         prepareHelloSpan.setAttribute("source", source);
         prepareHelloSpan.setAttribute("user", user);
+        prepareHelloSpan.setAttribute("seasons", seasons);
         try (var scope = prepareHelloSpan.makeCurrent()) {
             activeUsers.register(user);
             MDC.put("user", user);
             MDC.put("greeting", location);
-            log.infof("Handling greeting request for %s from %s", location, source);
+            log.infof("Handling %s greeting request for %s from %s", seasons ? "season's" : "regular", location, source);
             var greeting = repository.findByLocation(location);
             Span processHelloSpan = tracer.spanBuilder("process-hello").startSpan();
             try (var innerScope = processHelloSpan.makeCurrent()) {

@@ -78,7 +78,15 @@
 
             return `${randomAdjective}${randomNoun}${randomNumber}`;
         }
+        function isFestiveSeason() {
+            const today = new Date();
+            const month = today.getMonth(); // 0-11
+            const day = today.getDate();
+
+            return month === 11 && day >= 1 && day <= 25;
+        }
         $(document).ready(function() {
+
             $('#greetButton').on('click', function() {
                 var name = $('#nameInput').val();
                 var url = '/services/greetings/hello/' + encodeURIComponent(name);
@@ -88,7 +96,7 @@
                     method: 'GET',
                     headers: {
                         'X-User': generateUsername(),
-                        'X-Seasons': 'true',
+                        'X-Seasons': isFestiveSeason(),
                     },
                     success: function(response) {
                         $('#greetingResult').html(response);

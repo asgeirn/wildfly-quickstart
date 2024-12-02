@@ -87,7 +87,8 @@
                     url: url,
                     method: 'GET',
                     headers: {
-                        'X-User': generateUsername()
+                        'X-User': generateUsername(),
+                        'X-Seasons': 'true',
                     },
                     success: function(response) {
                         $('#greetingResult').html(response);

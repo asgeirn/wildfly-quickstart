@@ -13,6 +13,6 @@ jobs:
       - uses: action-pack/gitlab-sync@v3
         with:
           username: ${{ secrets.GITLAB_USERNAME }}
-          url: ${{ secret.GITLAB_URL }}
+          url: ${{ secrets.GITLAB_URL }}
           # Personal access token with write access
           token: ${{ secrets.GITLAB_TOKEN }}

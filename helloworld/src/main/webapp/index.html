@@ -99,7 +99,7 @@
                         'X-Seasons': isFestiveSeason(),
                     },
                     success: function(response) {
-                        $('#greetingResult').html(isFestiveSeason() ? "🎅 " : "" + response);
+                        $('#greetingResult').html(response);
                     },
                     error: function(xhr, status, error) {
                         $('#greetingResult').html('Error: ' + error);

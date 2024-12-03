@@ -35,7 +35,7 @@
     </p>
 
     <p>
-        <div id="greetingResult"></div>
+        <div id="greetingResult">Your greeting will appear here.</div>
     </p>
 
     <h2>Available greetings</h2>
@@ -90,7 +90,7 @@
             $('#greetButton').on('click', function() {
                 var name = $('#nameInput').val();
                 var url = '/services/greetings/hello/' + encodeURIComponent(name);
-
+                $('#greetingResult').html('Greeting in progress...');
                 $.ajax({
                     url: url,
                     method: 'GET',

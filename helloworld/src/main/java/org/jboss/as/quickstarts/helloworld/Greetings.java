@@ -87,7 +87,7 @@ public class Greetings {
                     MDC.put("message", message);
                     StringBuilder builder = new StringBuilder();
                     if (Boolean.TRUE.equals(seasons)) {
-                        builder.append("Ho-ho-ho, ");
+                        builder.append("🎅 Ho-ho-ho, ");
                     } else {
                         builder.append("Hello, ");
                     }

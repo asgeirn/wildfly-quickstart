@@ -347,9 +347,6 @@
                                     <scripts>
                                         <script>${project.build.scriptSourceDirectory}/configuration.cli</script>
                                     </scripts>
-                                    <properties-files>
-                                        <property-file>microprofile.properties</property-file>
-                                    </properties-files>
                                 </packaging-script>
                             </packaging-scripts>
                         </configuration>

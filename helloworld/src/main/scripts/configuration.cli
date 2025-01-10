@@ -33,3 +33,6 @@ end-if
 # Enable statistics
 /subsystem=undertow:write-attribute(name=statistics-enabled,value=true)
 /subsystem=transactions:write-attribute(name=statistics-enabled, value=true)
+
+# System properties
+/system-property=otel.sdk.disabled:add(value="false")

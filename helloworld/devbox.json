@@ -9,6 +9,9 @@
       "echo 'Welcome to devbox!' > /dev/null"
     ],
     "scripts": {
+      "build":[
+        "mvn -Popenshift,container package -Dwildfly.image.build=false"
+      ],
       "test": [
         "echo \"Error: no test specified\" && exit 1"
       ]

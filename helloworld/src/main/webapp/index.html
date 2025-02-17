@@ -25,6 +25,7 @@
         }
         .pending {
             font-style: italic;
+            color: hotpink;
         }
     </style>
 </head>
@@ -105,7 +106,8 @@
                         $('#greetingResult').removeClass('pending').html(response);
                     },
                     error: function(xhr, status, error) {
-                        $('#greetingResult').html('Error: ' + error);
+                        console.error('Error getting greeting:', error);
+                        $('#greetingResult').html(`<strong color="hotpink'>Error: ${error}</strong>`);
                     }
                 });
             });

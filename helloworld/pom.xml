@@ -52,8 +52,8 @@
         <version.bom.ee>${version.server}</version.bom.ee>
         <version.plugin.wildfly>6.0.1.Final</version.plugin.wildfly>
         <version.bom.microprofile>${version.server}</version.bom.microprofile>
-        <opentelemetry.version>1.47.0</opentelemetry.version>
-        <opentelemetry.instrumentation.version>2.13.1-alpha</opentelemetry.instrumentation.version>
+        <opentelemetry.version>1.49.0</opentelemetry.version>
+        <opentelemetry.instrumentation.version>2.14.0</opentelemetry.instrumentation.version>
     </properties>
 
     <dependencyManagement>
@@ -87,7 +87,7 @@
             <!-- OpenTelemetry Instrumentation BOM -->
             <dependency>
                 <groupId>io.opentelemetry.instrumentation</groupId>
-                <artifactId>opentelemetry-instrumentation-bom-alpha</artifactId>
+                <artifactId>opentelemetry-instrumentation-bom</artifactId>
                 <version>${opentelemetry.instrumentation.version}</version>
                 <type>pom</type>
                 <scope>import</scope>

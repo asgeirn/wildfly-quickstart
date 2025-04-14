@@ -106,14 +106,14 @@ public class Greetings {
             } catch (Exception e) {
                 processHelloSpan.setStatus(StatusCode.ERROR);
                 processHelloSpan.recordException(e);
-                throw e;
+                return Response.serverError().build();
             } finally {
                 processHelloSpan.end();
             }
         } catch (Exception e) {
             prepareHelloSpan.setStatus(StatusCode.ERROR);
             prepareHelloSpan.recordException(e);
-            throw e;
+            return Response.serverError().build();
         } finally {
             activeUsers.unregister(user);
             totalRequestsCounter.increment();

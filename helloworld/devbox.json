@@ -1,15 +1,15 @@
 {
   "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.12.0/.schema/devbox.schema.json",
   "packages": {
-    "openjdk": "17",
-    "maven":   "latest"
+    "jdk17_headless": "latest",
+    "maven":          "latest"
   },
   "shell": {
     "init_hook": [
       "echo 'Welcome to devbox!' > /dev/null"
     ],
     "scripts": {
-      "build":[
+      "build": [
         "mvn -Popenshift,container package -Dwildfly.image.build=false"
       ],
       "test": [

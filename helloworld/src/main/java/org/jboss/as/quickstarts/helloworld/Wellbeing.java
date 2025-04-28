@@ -17,10 +17,10 @@ public class Wellbeing {
     private Logger logger;
 
     @WithSpan
-    public Message wish() {
+    public Message wish(String user) {
         try (Client client = ClientBuilder.newClient()) {
             WebTarget target = client.target("https://api.twingine.com/wish");
-            try (Response response = target.request().get()) {
+            try (Response response = target.request().header("X-User", user).get()) {
                 logger.infof("Response: %s", response.getStatusInfo());
                 var message = response.readEntity(Message.class);
                 return message;

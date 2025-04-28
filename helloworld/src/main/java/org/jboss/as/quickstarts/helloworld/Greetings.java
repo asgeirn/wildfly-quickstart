@@ -92,7 +92,7 @@ public class Greetings {
                         builder.append("Hello, ");
                     }
                     builder.append(message).append('!');
-                    var wish = wellbeing.wish();
+                    var wish = wellbeing.wish(user);
                     if (wish.message() != null && !wish.message().isBlank()) {
                         MDC.put("wish", wish.message());
                         builder.append(' ').append(wish.message());

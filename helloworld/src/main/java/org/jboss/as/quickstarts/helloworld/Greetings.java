@@ -69,16 +69,19 @@ public class Greetings {
             @HeaderParam("X-Forwarded-For") @DefaultValue("0.0.0.0") String source,
             @HeaderParam("X-User") @DefaultValue("unknown") String user,
             @HeaderParam("X-Seasons") @DefaultValue("false") Boolean seasons) {
-        Span prepareHelloSpan = tracer.spanBuilder("prepare-hello").startSpan();
-        prepareHelloSpan.setAttribute("greeting", location);
-        prepareHelloSpan.setAttribute("source", source);
-        prepareHelloSpan.setAttribute("user", user);
-        prepareHelloSpan.setAttribute("seasons", seasons);
+        Span prepareHelloSpan = tracer
+                .spanBuilder("prepare-hello")
+                .setAttribute("greeting", location)
+                .setAttribute("source", source)
+                .setAttribute("user", user)
+                .setAttribute("seasons", seasons)
+                .startSpan();
         try (var scope = prepareHelloSpan.makeCurrent()) {
             activeUsers.register(user);
             MDC.put("user", user);
             MDC.put("greeting", location);
-            log.infof("Handling %s greeting request for %s from %s", seasons ? "season's" : "regular", location, source);
+            log.infof("Handling %s greeting request for %s from %s", seasons ? "season's" : "regular", location,
+                    source);
             var greeting = repository.findByLocation(location);
             Span processHelloSpan = tracer.spanBuilder("process-hello").startSpan();
             try (var innerScope = processHelloSpan.makeCurrent()) {
@@ -128,9 +131,11 @@ public class Greetings {
     public List<Greeting> getAllGreetings(
             @HeaderParam("X-Forwarded-For") @DefaultValue("0.0.0.0") String source,
             @HeaderParam("X-User") @DefaultValue("unknown") String user) {
-        var listGreetingsSpan = tracer.spanBuilder("list-greetings").startSpan();
-        listGreetingsSpan.setAttribute("user", user);
-        listGreetingsSpan.setAttribute("source", source);
+        var listGreetingsSpan = tracer
+                .spanBuilder("list-greetings")
+                .setAttribute("user", user)
+                .setAttribute("source", source)
+                .startSpan();
         MDC.put("user", user);
         MDC.put("source", source);
         try (var scope = listGreetingsSpan.makeCurrent()) {
@@ -157,7 +162,10 @@ public class Greetings {
             @PathParam("location") String location,
             @PathParam("message") String message,
             @HeaderParam("X-Forwarded-For") String source) {
-        Span createHelloSpan = tracer.spanBuilder("create-hello").startSpan();
+        Span createHelloSpan = tracer
+                .spanBuilder("create-hello")
+                .setAttribute("source", source)
+                .startSpan();
         MDC.put("message", message);
         log.infof("Creating greeting for %s from %s", location, source);
         try (var scope = createHelloSpan.makeCurrent()) {
@@ -185,7 +193,8 @@ public class Greetings {
     @Produces(MediaType.TEXT_PLAIN)
     public Response getHeaders(@Context HttpHeaders headers) {
         StringBuilder builder = new StringBuilder();
-        headers.getRequestHeaders().forEach((k, v) -> builder.append(k).append('=').append(String.join(",", v)).append('\n'));
+        headers.getRequestHeaders()
+                .forEach((k, v) -> builder.append(k).append('=').append(String.join(",", v)).append('\n'));
         return Response.ok(builder.toString()).build();
     }
 

@@ -35,6 +35,8 @@ variables:
     --no-transfer-progress
     -DinstallAtEnd=true
     -DdeployAtEnd=true
+    -pl helloworld
+    -am
 
 # This template uses the latest Maven 3 release, e.g., 3.8.6, and OpenJDK 8 (LTS)
 # for verifying and deploying images

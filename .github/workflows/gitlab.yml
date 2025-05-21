@@ -11,6 +11,7 @@ jobs:
         with:
           fetch-depth: 0
       - uses: action-pack/gitlab-sync@v3
+        if: ${{ !contains(github.ref, 'renovate') }}
         with:
           username: ${{ secrets.GITLAB_USERNAME }}
           url: ${{ secrets.GITLAB_URL }}

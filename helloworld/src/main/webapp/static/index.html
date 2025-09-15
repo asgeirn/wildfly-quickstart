@@ -27,6 +27,18 @@
             font-style: italic;
             color: hotpink;
         }
+        .deleteBtn {
+            background-color: #ff4444;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            cursor: pointer;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        .deleteBtn:hover {
+            background-color: #cc0000;
+        }
     </style>
 </head>
 <body>
@@ -53,6 +65,7 @@
             <tr>
                 <th>Greeting</th>
                 <th>Message</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -61,6 +74,7 @@
             <tr class="input-row">
                 <td><input type="text" id="newGreeting" placeholder="New Greeting"></td>
                 <td><input type="text" id="newMessage" placeholder="New Message"></td>
+                <td></td>
             </tr>
         </tfoot>
     </table>
@@ -121,7 +135,7 @@
                         var tbody = $('#greetingsTable tbody');
                         tbody.empty();
                         $.each(response, function(i, item) {
-                            tbody.append('<tr><td>' + item.location + '</td><td>' + item.message + '</td></tr>');
+                            tbody.append('<tr><td>' + item.location + '</td><td>' + item.message + '</td><td><button class="deleteBtn" data-location="' + item.location + '" data-message="' + item.message + '">Delete</button></td></tr>');
                         });
                     },
                     error: function(xhr, status, error) {
@@ -145,6 +159,29 @@
                     },
                     error: function(xhr, status, error) {
                         console.error('Error creating greeting:', error);
+                    }
+                });
+            });
+
+            // Handle delete button clicks
+            $(document).on('click', '.deleteBtn', function() {
+                var location = $(this).data('location');
+                var message = $(this).data('message');
+
+                $.ajax({
+                    url: '/services/greetings/hello/' + encodeURIComponent(location),
+                    method: 'DELETE',
+                    headers: {
+                        'X-User': generateUsername()
+                    },
+                    success: function(response) {
+                        // Place the deleted greeting in the input fields for editing
+                        $('#newGreeting').val(response.location);
+                        $('#newMessage').val(response.message);
+                        loadGreetings();
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error deleting greeting:', error);
                     }
                 });
             });

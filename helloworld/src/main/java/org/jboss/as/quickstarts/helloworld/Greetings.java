@@ -1,7 +1,15 @@
 package org.jboss.as.quickstarts.helloworld;
 
-import java.util.List;
-
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.StatusCode;
+import io.opentelemetry.api.trace.Tracer;
+import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+import jakarta.transaction.UserTransaction;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.HeaderParam;
@@ -14,23 +22,14 @@ import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
-
+import java.util.List;
 import org.jboss.logging.Logger;
 import org.jboss.logging.MDC;
-
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.opentelemetry.api.trace.Span;
-import io.opentelemetry.api.trace.StatusCode;
-import io.opentelemetry.api.trace.Tracer;
-import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Inject;
-import jakarta.transaction.UserTransaction;
 
 @RequestScoped
 @Path("/greetings")
 public class Greetings {
+
     @Inject
     private Logger log;
 
@@ -57,33 +56,40 @@ public class Greetings {
     @PostConstruct
     private void createMeters() {
         totalRequestsCounter = Counter.builder("total_requests")
-                .description("Total number of requests")
-                .register(registry);
+            .description("Total number of requests")
+            .register(registry);
     }
 
     @GET
     @Path("/hello/{location}")
     @Produces(MediaType.TEXT_PLAIN)
     public Response hello(
-            @PathParam("location") String location,
-            @HeaderParam("X-Forwarded-For") @DefaultValue("0.0.0.0") String source,
-            @HeaderParam("X-User") @DefaultValue("unknown") String user,
-            @HeaderParam("X-Seasons") @DefaultValue("false") Boolean seasons) {
+        @PathParam("location") String location,
+        @HeaderParam("X-Forwarded-For") @DefaultValue("0.0.0.0") String source,
+        @HeaderParam("X-User") @DefaultValue("unknown") String user,
+        @HeaderParam("X-Seasons") @DefaultValue("false") Boolean seasons
+    ) {
         Span prepareHelloSpan = tracer
-                .spanBuilder("prepare-hello")
-                .setAttribute("greeting", location)
-                .setAttribute("source", source)
-                .setAttribute("user", user)
-                .setAttribute("seasons", seasons)
-                .startSpan();
+            .spanBuilder("prepare-hello")
+            .setAttribute("greeting", location)
+            .setAttribute("source", source)
+            .setAttribute("user", user)
+            .setAttribute("seasons", seasons)
+            .startSpan();
         try (var scope = prepareHelloSpan.makeCurrent()) {
             activeUsers.register(user);
             MDC.put("user", user);
             MDC.put("greeting", location);
-            log.infof("Handling %s greeting request for %s from %s", seasons ? "season's" : "regular", location,
-                    source);
+            log.infof(
+                "Handling %s greeting request for %s from %s",
+                seasons ? "season's" : "regular",
+                location,
+                source
+            );
             var greeting = repository.findByLocation(location);
-            Span processHelloSpan = tracer.spanBuilder("process-hello").startSpan();
+            Span processHelloSpan = tracer
+                .spanBuilder("process-hello")
+                .startSpan();
             try (var innerScope = processHelloSpan.makeCurrent()) {
                 if (greeting != null) {
                     var message = greeting.getMessage();
@@ -103,7 +109,10 @@ public class Greetings {
                     processHelloSpan.setStatus(StatusCode.OK);
                     return Response.ok(builder.append('\n').toString()).build();
                 } else {
-                    processHelloSpan.setStatus(StatusCode.ERROR, "Greeting not found");
+                    processHelloSpan.setStatus(
+                        StatusCode.ERROR,
+                        "Greeting not found"
+                    );
                     return Response.status(Status.NOT_FOUND).build();
                 }
             } catch (Exception e) {
@@ -129,13 +138,14 @@ public class Greetings {
     @Path("/list")
     @Produces(MediaType.APPLICATION_JSON)
     public List<Greeting> getAllGreetings(
-            @HeaderParam("X-Forwarded-For") @DefaultValue("0.0.0.0") String source,
-            @HeaderParam("X-User") @DefaultValue("unknown") String user) {
+        @HeaderParam("X-Forwarded-For") @DefaultValue("0.0.0.0") String source,
+        @HeaderParam("X-User") @DefaultValue("unknown") String user
+    ) {
         var listGreetingsSpan = tracer
-                .spanBuilder("list-greetings")
-                .setAttribute("user", user)
-                .setAttribute("source", source)
-                .startSpan();
+            .spanBuilder("list-greetings")
+            .setAttribute("user", user)
+            .setAttribute("source", source)
+            .startSpan();
         MDC.put("user", user);
         MDC.put("source", source);
         try (var scope = listGreetingsSpan.makeCurrent()) {
@@ -159,13 +169,14 @@ public class Greetings {
     @Path("/hello/{location}/{message}")
     @Produces(MediaType.TEXT_PLAIN)
     public Response createHello(
-            @PathParam("location") String location,
-            @PathParam("message") String message,
-            @HeaderParam("X-Forwarded-For") String source) {
+        @PathParam("location") String location,
+        @PathParam("message") String message,
+        @HeaderParam("X-Forwarded-For") String source
+    ) {
         Span createHelloSpan = tracer
-                .spanBuilder("create-hello")
-                .setAttribute("source", source)
-                .startSpan();
+            .spanBuilder("create-hello")
+            .setAttribute("source", source)
+            .startSpan();
         MDC.put("message", message);
         log.infof("Creating greeting for %s from %s", location, source);
         try (var scope = createHelloSpan.makeCurrent()) {
@@ -188,14 +199,72 @@ public class Greetings {
         }
     }
 
+    @DELETE
+    @Path("/hello/{location}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteHello(
+        @PathParam("location") String location,
+        @HeaderParam("X-Forwarded-For") @DefaultValue("0.0.0.0") String source,
+        @HeaderParam("X-User") @DefaultValue("unknown") String user
+    ) {
+        Span deleteHelloSpan = tracer
+            .spanBuilder("delete-hello")
+            .setAttribute("location", location)
+            .setAttribute("source", source)
+            .setAttribute("user", user)
+            .startSpan();
+        MDC.put("user", user);
+        MDC.put("location", location);
+        log.infof("Deleting greeting for %s from %s", location, source);
+        try (var scope = deleteHelloSpan.makeCurrent()) {
+            activeUsers.register(user);
+            // Find the greeting first to return it
+            Greeting greeting = repository.findByLocation(location);
+            if (greeting == null) {
+                deleteHelloSpan.setStatus(
+                    StatusCode.ERROR,
+                    "Greeting not found"
+                );
+                return Response.status(Status.NOT_FOUND).build();
+            }
+
+            txn.begin();
+            repository.delete(location);
+            txn.commit();
+            deleteHelloSpan.setStatus(StatusCode.OK);
+            // Return the deleted greeting so the client can use it for editing
+            return Response.ok(greeting).build();
+        } catch (Exception e) {
+            MDC.put("error", e.getMessage());
+            deleteHelloSpan.setStatus(StatusCode.ERROR);
+            deleteHelloSpan.recordException(e);
+            try {
+                txn.rollback();
+            } catch (Exception rollbackException) {
+                log.error("Failed to rollback transaction", rollbackException);
+            }
+            throw new RuntimeException(e);
+        } finally {
+            deleteHelloSpan.end();
+            activeUsers.unregister(user);
+            MDC.clear();
+        }
+    }
+
     @GET
     @Path("/headers")
     @Produces(MediaType.TEXT_PLAIN)
     public Response getHeaders(@Context HttpHeaders headers) {
         StringBuilder builder = new StringBuilder();
-        headers.getRequestHeaders()
-                .forEach((k, v) -> builder.append(k).append('=').append(String.join(",", v)).append('\n'));
+        headers
+            .getRequestHeaders()
+            .forEach((k, v) ->
+                builder
+                    .append(k)
+                    .append('=')
+                    .append(String.join(",", v))
+                    .append('\n')
+            );
         return Response.ok(builder.toString()).build();
     }
-
 }

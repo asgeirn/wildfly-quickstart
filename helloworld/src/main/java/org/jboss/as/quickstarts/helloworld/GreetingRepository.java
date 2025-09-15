@@ -1,11 +1,10 @@
 package org.jboss.as.quickstarts.helloworld;
 
-import java.util.List;
-
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
+import java.util.List;
 
 @ApplicationScoped
 public class GreetingRepository {
@@ -25,6 +24,16 @@ public class GreetingRepository {
 
     @WithSpan
     public List<Greeting> getAllGreetings() {
-        return em.createQuery("SELECT g FROM Greeting g", Greeting.class).getResultList();
+        return em
+            .createQuery("SELECT g FROM Greeting g", Greeting.class)
+            .getResultList();
+    }
+
+    @WithSpan
+    public void delete(String location) {
+        Greeting greeting = em.find(Greeting.class, location);
+        if (greeting != null) {
+            em.remove(greeting);
+        }
     }
 }

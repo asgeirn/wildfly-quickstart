@@ -1,7 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "includePaths": [
-    "helloworld/**",
-    "pom.xml"
+    "helloworld/**"
   ]
 }

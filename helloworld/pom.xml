@@ -241,7 +241,11 @@
                         </execution>
                     </executions>
                     <configuration>
-                        <keysMapLocation>${project.basedir}/pgp-keys-map.list</keysMapLocation>
+                        <keysMapLocations>
+                            <keysMapLocation>${project.basedir}/pgp-keys-map.list</keysMapLocation>
+                            <keysMapLocation>${project.basedir}/wildfly-keys-map.list</keysMapLocation>
+                            <keysMapLocation>${project.basedir}/wildfly-keys-map-nosig.list</keysMapLocation>
+                        </keysMapLocations>
                         <verifyPlugins>true</verifyPlugins>
                         <verifyPluginDependencies>true</verifyPluginDependencies>
                         <verifyAtypical>true</verifyAtypical>

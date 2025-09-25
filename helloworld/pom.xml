@@ -229,11 +229,50 @@
                         </dependency>
                     </dependencies>
                 </plugin>
+                <plugin>
+                    <groupId>org.simplify4u.plugins</groupId>
+                    <artifactId>pgpverify-maven-plugin</artifactId>
+                    <version>1.19.1</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <keysMapLocation>/pgp-keys-map.list</keysMapLocation>
+                        <verifyPlugins>true</verifyPlugins>
+                        <verifyPluginDependencies>true</verifyPluginDependencies>
+                        <verifyAtypical>true</verifyAtypical>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.simplify4u</groupId>
+                            <artifactId>pgp-keys-map</artifactId>
+                            <version>v2025.03.15</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
 
     <profiles>
+        <profile>
+            <id>pgpkeys</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.simplify4u.plugins</groupId>
+                        <artifactId>pgpverify-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>provisioned-server</id>
             <activation>
@@ -391,7 +430,8 @@
                             <packaging-scripts>
                                 <packaging-script>
                                     <scripts>
-                                        <script>${project.build.scriptSourceDirectory}/configuration.cli</script>
+                                        <script>
+                                            ${project.build.scriptSourceDirectory}/configuration.cli</script>
                                     </scripts>
                                 </packaging-script>
                             </packaging-scripts>

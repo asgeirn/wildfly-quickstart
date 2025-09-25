@@ -246,13 +246,6 @@
                         <verifyPluginDependencies>true</verifyPluginDependencies>
                         <verifyAtypical>true</verifyAtypical>
                     </configuration>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.simplify4u</groupId>
-                            <artifactId>pgp-keys-map</artifactId>
-                            <version>v2025.03.15</version>
-                        </dependency>
-                    </dependencies>
                 </plugin>
             </plugins>
         </pluginManagement>

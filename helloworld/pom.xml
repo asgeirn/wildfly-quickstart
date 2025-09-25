@@ -241,7 +241,7 @@
                         </execution>
                     </executions>
                     <configuration>
-                        <keysMapLocation>/pgp-keys-map.list</keysMapLocation>
+                        <keysMapLocation>${project.basedir}/pgp-keys-map.list</keysMapLocation>
                         <verifyPlugins>true</verifyPlugins>
                         <verifyPluginDependencies>true</verifyPluginDependencies>
                         <verifyAtypical>true</verifyAtypical>

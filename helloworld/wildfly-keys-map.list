@@ -8,3 +8,4 @@ org.twdata.maven:mojo-executor:2.4.1 = 0x1BE56E950FAF2FD7247E877B2E36C3DD6D5C449
 org.wildfly.glow:wildfly-glow-core:1.5.0.Final = 0xF88F1E1773E7B59122B924E55EF1B82981CC32E6
 org.wildfly.plugins:wildfly-maven-plugin:5.1.4.Final = 0x6D2AF456B8CB597387901C786F29F72839B3A8E7
 org.wildfly.plugins:wildfly-plugin-core:5.1.4.Final = 0x6D2AF456B8CB597387901C786F29F72839B3A8E7
+org.wildfly.plugins:wildfly-plugin-tools:1.2.4.Final = 0x6D2AF456B8CB597387901C786F29F72839B3A8E7

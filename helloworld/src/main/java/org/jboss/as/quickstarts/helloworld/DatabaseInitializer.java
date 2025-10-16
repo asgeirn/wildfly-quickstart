@@ -1,12 +1,15 @@
 package org.jboss.as.quickstarts.helloworld;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.UserTransaction;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.jboss.logging.Logger;
 
-@ApplicationScoped
+@Path("/database")
 public class DatabaseInitializer {
 
     @Inject
@@ -18,8 +21,10 @@ public class DatabaseInitializer {
     @Inject
     private UserTransaction txn;
 
-    @PostConstruct
-    public void initializeDatabase() {
+    @PUT
+    @Path("/initialize")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response initializeDatabase() {
         try {
             txn.begin();
 
@@ -41,18 +46,40 @@ public class DatabaseInitializer {
                 insertGreeting("Bouvet", "pingviner");
 
                 logger.info("Successfully inserted example greetings data");
+                txn.commit();
+                return Response.ok()
+                    .entity(
+                        "{\"message\": \"Database initialized successfully with example greetings\"}"
+                    )
+                    .build();
             } else {
-                logger.info("Database already contains greetings data, skipping initialization");
+                logger.info(
+                    "Database already contains greetings data, skipping initialization"
+                );
+                txn.commit();
+                return Response.ok()
+                    .entity(
+                        "{\"message\": \"Database already contains data, initialization skipped\"}"
+                    )
+                    .build();
             }
-
-            txn.commit();
         } catch (Exception e) {
             logger.error("Failed to initialize database", e);
             try {
                 txn.rollback();
             } catch (Exception rollbackException) {
-                logger.error("Failed to rollback transaction", rollbackException);
+                logger.error(
+                    "Failed to rollback transaction",
+                    rollbackException
+                );
             }
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(
+                    "{\"error\": \"Failed to initialize database: " +
+                        e.getMessage() +
+                        "\"}"
+                )
+                .build();
         }
     }
 
@@ -64,7 +91,15 @@ public class DatabaseInitializer {
             greetingRepository.insert(greeting);
             logger.info("Inserted greeting for location: " + location);
         } catch (Exception e) {
-            logger.errorf(e, "Failed to insert greeting for location %s", location);
+            logger.errorf(
+                e,
+                "Failed to insert greeting for location %s",
+                location
+            );
+            throw new RuntimeException(
+                "Failed to insert greeting for location: " + location,
+                e
+            );
         }
     }
 }

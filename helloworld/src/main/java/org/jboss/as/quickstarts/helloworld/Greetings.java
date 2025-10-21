@@ -102,9 +102,10 @@ public class Greetings {
                     }
                     builder.append(message).append('!');
                     var wish = wellbeing.wish(user);
-                    if (wish.message() != null && !wish.message().isBlank()) {
+                    if (wish != null && wish.message() != null && !wish.message().isBlank()) {
                         MDC.put("wish", wish.message());
-                        builder.append(' ').append(wish.message());
+                        MDC.put("advice", wish.advice());
+                        builder.append('\n').append(wish.message()).append('\n').append(wish.advice());
                     }
                     processHelloSpan.setStatus(StatusCode.OK);
                     return Response.ok(builder.append('\n').toString()).build();

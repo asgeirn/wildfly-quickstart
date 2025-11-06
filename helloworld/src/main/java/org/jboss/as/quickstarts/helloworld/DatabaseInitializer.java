@@ -37,7 +37,7 @@ public class DatabaseInitializer {
                 insertGreeting("Sandvika", "storsenter");
                 insertGreeting("Norway", "vikings");
                 insertGreeting("Denmark", "hunde");
-                insertGreeting("Sweeden", "grabbar");
+                insertGreeting("Sweden", "grabbar");
                 insertGreeting("England", "chaps");
                 insertGreeting("America", "make it great again");
                 insertGreeting("Trump", "tariffs");

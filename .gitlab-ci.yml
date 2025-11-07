@@ -67,6 +67,7 @@ update:
   script:
     - >
       curl --request PUT
+      --verbose
       --fail
       --cacert $ROOT_CA
       --header "PRIVATE-TOKEN: ${NECCCIS_PROJECT_TOKEN}"

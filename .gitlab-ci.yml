@@ -67,6 +67,7 @@ update:
   script:
     - >
       curl --request PUT
+      --cacert $CI_SERVER_TLS_CA_FILE
       --header "PRIVATE-TOKEN: ${CI_JOB_TOKEN}"
       --url ${CI_API_V4_URL}/projects/1/repository/submodules/quickstart
       --data "branch=main&commit_sha=${CI_COMMIT_SHA}"

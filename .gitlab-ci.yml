@@ -68,7 +68,7 @@ update:
     - >
       curl --request PUT
       --verbose
-      --fail
+      --fail-with-body
       --cacert $ROOT_CA
       --header "PRIVATE-TOKEN: ${NECCCIS_PROJECT_TOKEN}"
       --url ${CI_API_V4_URL}/projects/1/repository/submodules/quickstart

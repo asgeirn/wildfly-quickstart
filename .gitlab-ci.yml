@@ -58,7 +58,8 @@ update:
   stage: .post
   image: ${REGISTRY}/cgr/chainguard/curl:latest-dev
   rules:
-    - changes:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
         paths:
           - .gitlab-ci.yml
           - pom.xml

@@ -71,6 +71,6 @@ update:
       --verbose
       --fail-with-body
       --cacert $ROOT_CA
-      --header "PRIVATE-TOKEN: ${NECCCIS_PROJECT_TOKEN}"
+      --header "PRIVATE-TOKEN: ${TWINGINE_GROUP_TOKEN}"
       --url ${CI_API_V4_URL}/projects/1/repository/submodules/quickstart
       --data "branch=main&commit_sha=${CI_COMMIT_SHA}"

@@ -4,7 +4,10 @@ import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.management.ManagementFactory;
 import java.util.Properties;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import org.jboss.logging.Logger;
 
 @ApplicationScoped
@@ -131,16 +134,27 @@ public class BuildInfoService {
     }
 
     private String detectPlatformVersion() {
-        // Try to get platform version from system property
-        String version = System.getProperty("jboss.product.version");
-        if (version == null) {
-            // Fallback to AS version if product version not available
-            version = System.getProperty("jboss.as.release.version");
+        try {
+            // Use the platform MBeanServer to query WildFly management interface
+            MBeanServer mBeanServer =
+                ManagementFactory.getPlatformMBeanServer();
+            ObjectName objectName = new ObjectName(
+                "jboss.as:management-root=server"
+            );
+            String version = (String) mBeanServer.getAttribute(
+                objectName,
+                "productVersion"
+            );
+            if (version != null) {
+                return version;
+            }
+        } catch (Exception e) {
+            LOGGER.warnf(
+                "Failed to get WildFly version via JMX: %s",
+                e.getMessage()
+            );
         }
-        if (version == null) {
-            version = "unknown";
-        }
-        return version;
+        return "unknown";
     }
 
     public BuildInfo getBuildInfo() {

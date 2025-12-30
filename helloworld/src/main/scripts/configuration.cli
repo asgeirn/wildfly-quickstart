@@ -1,14 +1,3 @@
-# Add the socket binding
-/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=log-server:add(host=localhost, port=9090)
-# Add a json-formatter
-/subsystem=logging/json-formatter=logstash:add(exception-output-type=formatted)
-# Add the socket handler
-/subsystem=logging/socket-handler=log-server-handler:add(named-formatter=logstash, level=INFO, outbound-socket-binding-ref=log-server)
-# Wrap in async handler
-/subsystem=logging/async-handler=async-log-server-handler:add(subhandlers=[log-server-handler], queue-length=50)
-# Add the handler to the root logger
-/subsystem=logging/root-logger=ROOT:add-handler(name=async-log-server-handler)
-
 # Set up access log to file
 /subsystem=undertow/server=default-server/host=default-host/setting=access-log:add(pattern="%h %l %u %t '%r' %s %b %D", directory="/data/logs", prefix="access_log.", suffix="log")
 

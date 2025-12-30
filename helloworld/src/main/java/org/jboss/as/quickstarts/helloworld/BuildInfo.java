@@ -9,5 +9,6 @@ public record BuildInfo(
     String commitSha,
     String commitTag,
     String version,
-    String buildNumber
+    String buildNumber,
+    String wildflyVersion
 ) {}

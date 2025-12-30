@@ -56,4 +56,13 @@ public class BuildInfoResource {
             buildInfoService.getBuildInfo().buildNumber()
         ).build();
     }
+
+    @GET
+    @Path("/wildfly-version")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response getWildflyVersion() {
+        return Response.ok(
+            buildInfoService.getBuildInfo().wildflyVersion()
+        ).build();
+    }
 }

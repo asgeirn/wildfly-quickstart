@@ -19,6 +19,7 @@ public class BuildInfoService {
     private String commitTag;
     private String version;
     private String buildNumber;
+    private String wildflyVersion;
 
     @PostConstruct
     public void init() {
@@ -60,13 +61,16 @@ public class BuildInfoService {
                     "BUILD_PIPELINE_ID"
                 );
 
+                wildflyVersion = detectWildflyVersion();
+
                 LOGGER.infof(
-                    "Build info loaded successfully - Timestamp: %s, SHA: %s, Tag: %s, Version: %s, Build: %s",
+                    "Build info loaded successfully - Timestamp: %s, SHA: %s, Tag: %s, Version: %s, Build: %s, WildFly: %s",
                     buildTimestamp,
                     commitSha,
                     commitTag,
                     version,
-                    buildNumber
+                    buildNumber,
+                    wildflyVersion
                 );
             } else {
                 LOGGER.warn(
@@ -113,15 +117,30 @@ public class BuildInfoService {
         if (commitTag == null) commitTag = "unknown";
         if (version == null) version = "unknown";
         if (buildNumber == null) buildNumber = "unknown";
+        wildflyVersion = detectWildflyVersion();
 
         LOGGER.infof(
-            "Build info loaded from environment variables - Timestamp: %s, SHA: %s, Tag: %s, Version: %s, Build: %s",
+            "Build info loaded from environment variables - Timestamp: %s, SHA: %s, Tag: %s, Version: %s, Build: %s, WildFly: %s",
             buildTimestamp,
             commitSha,
             commitTag,
             version,
-            buildNumber
+            buildNumber,
+            wildflyVersion
         );
+    }
+
+    private String detectWildflyVersion() {
+        // Try to get WildFly version from system property
+        String version = System.getProperty("jboss.product.version");
+        if (version == null) {
+            // Fallback to AS version if product version not available
+            version = System.getProperty("jboss.as.release.version");
+        }
+        if (version == null) {
+            version = "unknown";
+        }
+        return version;
     }
 
     public BuildInfo getBuildInfo() {
@@ -130,7 +149,8 @@ public class BuildInfoService {
             commitSha,
             commitTag,
             version,
-            buildNumber
+            buildNumber,
+            wildflyVersion
         );
     }
 }

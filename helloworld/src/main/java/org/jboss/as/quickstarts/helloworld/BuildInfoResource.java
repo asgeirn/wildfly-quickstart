@@ -58,11 +58,11 @@ public class BuildInfoResource {
     }
 
     @GET
-    @Path("/wildfly-version")
+    @Path("/platform-version")
     @Produces(MediaType.TEXT_PLAIN)
-    public Response getWildflyVersion() {
+    public Response getPlatformVersion() {
         return Response.ok(
-            buildInfoService.getBuildInfo().wildflyVersion()
+            buildInfoService.getBuildInfo().platformVersion()
         ).build();
     }
 }

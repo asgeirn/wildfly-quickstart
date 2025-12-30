@@ -10,5 +10,5 @@ public record BuildInfo(
     String commitTag,
     String version,
     String buildNumber,
-    String wildflyVersion
+    String platformVersion
 ) {}

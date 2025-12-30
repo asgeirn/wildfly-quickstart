@@ -19,7 +19,7 @@ public class BuildInfoService {
     private String commitTag;
     private String version;
     private String buildNumber;
-    private String wildflyVersion;
+    private String platformVersion;
 
     @PostConstruct
     public void init() {
@@ -61,16 +61,16 @@ public class BuildInfoService {
                     "BUILD_PIPELINE_ID"
                 );
 
-                wildflyVersion = detectWildflyVersion();
+                platformVersion = detectPlatformVersion();
 
                 LOGGER.infof(
-                    "Build info loaded successfully - Timestamp: %s, SHA: %s, Tag: %s, Version: %s, Build: %s, WildFly: %s",
+                    "Build info loaded successfully - Timestamp: %s, SHA: %s, Tag: %s, Version: %s, Build: %s, Platform: %s",
                     buildTimestamp,
                     commitSha,
                     commitTag,
                     version,
                     buildNumber,
-                    wildflyVersion
+                    platformVersion
                 );
             } else {
                 LOGGER.warn(
@@ -117,21 +117,21 @@ public class BuildInfoService {
         if (commitTag == null) commitTag = "unknown";
         if (version == null) version = "unknown";
         if (buildNumber == null) buildNumber = "unknown";
-        wildflyVersion = detectWildflyVersion();
+        platformVersion = detectPlatformVersion();
 
         LOGGER.infof(
-            "Build info loaded from environment variables - Timestamp: %s, SHA: %s, Tag: %s, Version: %s, Build: %s, WildFly: %s",
+            "Build info loaded from environment variables - Timestamp: %s, SHA: %s, Tag: %s, Version: %s, Build: %s, Platform: %s",
             buildTimestamp,
             commitSha,
             commitTag,
             version,
             buildNumber,
-            wildflyVersion
+            platformVersion
         );
     }
 
-    private String detectWildflyVersion() {
-        // Try to get WildFly version from system property
+    private String detectPlatformVersion() {
+        // Try to get platform version from system property
         String version = System.getProperty("jboss.product.version");
         if (version == null) {
             // Fallback to AS version if product version not available
@@ -150,7 +150,7 @@ public class BuildInfoService {
             commitTag,
             version,
             buildNumber,
-            wildflyVersion
+            platformVersion
         );
     }
 }

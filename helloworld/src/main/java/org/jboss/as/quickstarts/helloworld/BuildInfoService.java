@@ -141,15 +141,20 @@ public class BuildInfoService {
             ObjectName objectName = new ObjectName(
                 "jboss.as:management-root=server"
             );
-            String version = (String) mBeanServer.getAttribute(
+            String productName = (String) mBeanServer.getAttribute(
                 objectName,
-                "productVersion"
+                "product-name"
             );
-            if (version != null) {
-                return version;
+            String productVersion = (String) mBeanServer.getAttribute(
+                objectName,
+                "product-version"
+            );
+            if (productName != null && productVersion != null) {
+                return String.format("%s %s", productName, productVersion);
             }
         } catch (Exception e) {
             LOGGER.warnf(
+                e,
                 "Failed to get WildFly version via JMX: %s",
                 e.getMessage()
             );
